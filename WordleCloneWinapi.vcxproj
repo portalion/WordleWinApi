@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -134,11 +134,13 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="KeyboardWindow.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PuzzleWindow.cpp" />
     <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="KeyboardWindow.h" />
+    <ClInclude Include="PuzzleWindow.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Window.h" />

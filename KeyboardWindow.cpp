@@ -16,6 +16,7 @@ bool KeyboardWindow::registerClass(HINSTANCE instance)
         .hInstance = instance,
         .hIcon = LoadIcon(instance, MAKEINTRESOURCE(IDI_APP_ICON)),
         .hbrBackground = CreateSolidBrush(RGB(255, 255, 255)),
+        .lpszMenuName = MAKEINTRESOURCE(IDM_DIFFICULTYMENU),
         .lpszClassName = nameOfClass.c_str()
     };
 
@@ -27,14 +28,16 @@ KeyboardWindow::KeyboardWindow(HINSTANCE instance)
 {
     registerClass(instance);
 
-    RECT size{0, 0, (Tile::size + Tile::margin) * 10 + 50, (Tile::size + Tile::margin) * 3 + 100};
+    RECT size{0, 0, (Tile::size + Tile::margin) * 10 + 4 * Tile::margin,
+        (Tile::size + Tile::margin) * 4 + 4 * Tile::margin};
 
     const POINT position =
     {
         .x = (GetSystemMetrics(SM_CXSCREEN) - size.right) / 2,
-        .y = (GetSystemMetrics(SM_CYSCREEN) + size.bottom) / 2
+        .y = (GetSystemMetrics(SM_CYSCREEN) - size.bottom) / 2 + 5 * (Tile::size + Tile::margin)
     };
-
+    AdjustWindowRectEx(&size, WS_SYSMENU |
+        WS_CAPTION | WS_MINIMIZEBOX, true, 0);
 	handle = CreateWindowEx(WS_EX_LAYERED, nameOfClass.c_str(), L"WORDLE - KEYBOARD",
 		WS_OVERLAPPED | WS_SYSMENU |
 		WS_CAPTION | WS_MINIMIZEBOX,
@@ -42,6 +45,18 @@ KeyboardWindow::KeyboardWindow(HINSTANCE instance)
 
     SetWindowLongPtrW(handle, 0, reinterpret_cast<LONG_PTR>(this));
     SetLayeredWindowAttributes(handle, 0, 255 * 50 / 100, LWA_ALPHA);
+
+    for (int i = 0; i < 10; i++)
+        tiles.push_back(Tile(2 * Tile::margin + i * (Tile::margin + Tile::size), 
+            2 * Tile::margin, KeyboardLayout[i]));
+    for (int i = 10; i < 19; i++)
+        tiles.push_back(Tile(2 * Tile::margin + (Tile::size + Tile::margin) / 2
+            + (i - 10) * (Tile::margin + Tile::size),
+            2 * Tile::margin + Tile::size + Tile::margin, KeyboardLayout[i]));
+    for (int i = 19; i < 26; i++)
+        tiles.push_back(Tile(2 * Tile::margin + (Tile::size + Tile::margin) / 2
+            + (i - 18) * (Tile::margin + Tile::size),
+            2 * (Tile::margin + Tile::size + Tile::margin), KeyboardLayout[i]));
 }
 
 LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)

@@ -1,5 +1,7 @@
 #include "Tile.h"
 
+int Tile::numberOfTries = 6;
+
 Tile::Tile(int posx, int posy, wchar_t letter) :
 	pos{ .left = posx, .top = posy, .right = posx + size, .bottom = posy + size}, 
 	actual{Color::None}
