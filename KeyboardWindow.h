@@ -1,5 +1,6 @@
 #pragma once
 #include "Window.h"
+#include "Tile.h"
 
 class KeyboardWindow : public Window<KeyboardWindow>
 {

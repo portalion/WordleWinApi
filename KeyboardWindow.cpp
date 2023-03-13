@@ -41,7 +41,7 @@ KeyboardWindow::KeyboardWindow(HINSTANCE instance)
 
     SetLayeredWindowAttributes(handle, 0, 255 * 50 / 100, LWA_ALPHA);
 }
-
+#include <vector>
 LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	switch (message)
@@ -52,7 +52,28 @@ LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARA
 	case WM_DESTROY:
 		PostQuitMessage(EXIT_SUCCESS);
 		return 0;
+    case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc;
+        hdc = BeginPaint(hwnd, &ps);
 
+        std::vector<Tile> tiles;
+        for (int i = 0; i < 10; i++)
+        {
+            tiles.push_back(Tile(12 + (Tile::size + 6 )* i, 12));
+            tiles[i].draw(&hdc);
+        }
+        for (int i = 10; i < 20; i++)
+        {
+            tiles.push_back(Tile(12 + (Tile::size + 6) * (i - 10), 12 + 6 + 55));
+            tiles[i].draw(&hdc);
+        }
+        
+
+        EndPaint(hwnd, &ps);
+    }
+        return 0L;
 	}
 	return DefWindowProcW(hwnd, message, wparam, lparam);
 }
