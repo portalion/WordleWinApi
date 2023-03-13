@@ -1,5 +1,7 @@
 #include "KeyboardWindow.h"
 
+const std::wstring KeyboardWindow::KeyboardLayout = L"QWERTYUIOPASDFGHJKLZXCVBNM";
+
 bool KeyboardWindow::registerClass(HINSTANCE instance)
 {
     WNDCLASSEX wc{};
@@ -25,23 +27,23 @@ KeyboardWindow::KeyboardWindow(HINSTANCE instance)
 {
     registerClass(instance);
 
-    const POINT size = { .x = 600, .y = 200 };
+    RECT size{0, 0, (Tile::size + Tile::margin) * 10 + 50, (Tile::size + Tile::margin) * 3 + 100};
+
     const POINT position =
     {
-        .x = (GetSystemMetrics(SM_CXSCREEN) - size.x) / 2,
-        .y = (GetSystemMetrics(SM_CYSCREEN) + size.y) / 2
+        .x = (GetSystemMetrics(SM_CXSCREEN) - size.right) / 2,
+        .y = (GetSystemMetrics(SM_CYSCREEN) + size.bottom) / 2
     };
 
 	handle = CreateWindowEx(WS_EX_LAYERED, nameOfClass.c_str(), L"WORDLE - KEYBOARD",
 		WS_OVERLAPPED | WS_SYSMENU |
 		WS_CAPTION | WS_MINIMIZEBOX,
-		position.x, position.y, size.x, size.y, nullptr, nullptr, instance, nullptr);
+		position.x, position.y, size.right, size.bottom, nullptr, nullptr, instance, nullptr);
 
     SetWindowLongPtrW(handle, 0, reinterpret_cast<LONG_PTR>(this));
-
     SetLayeredWindowAttributes(handle, 0, 255 * 50 / 100, LWA_ALPHA);
 }
-#include <vector>
+
 LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	switch (message)
@@ -58,18 +60,8 @@ LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARA
         HDC hdc;
         hdc = BeginPaint(hwnd, &ps);
 
-        std::vector<Tile> tiles;
-        for (int i = 0; i < 10; i++)
-        {
-            tiles.push_back(Tile(12 + (Tile::size + 6 )* i, 12));
-            tiles[i].draw(&hdc);
-        }
-        for (int i = 10; i < 20; i++)
-        {
-            tiles.push_back(Tile(12 + (Tile::size + 6) * (i - 10), 12 + 6 + 55));
-            tiles[i].draw(&hdc);
-        }
-        
+        for (auto tile : tiles)
+            tile.draw(hdc);
 
         EndPaint(hwnd, &ps);
     }

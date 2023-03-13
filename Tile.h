@@ -15,7 +15,7 @@ COLORREF stateToColor(Color color);
 class Tile
 {
 private:
-	LPCWCHAR letter;
+	wchar_t letter[1];
 	RECT pos;
 
 	COLORREF backgroundColor;
@@ -25,9 +25,10 @@ private:
 public:
 	static const int size = 55;
 	static const int elipseSize = 6;
+	static const int margin = 6;
 	//static const COLORREF fontColor;
 
-	Tile(int posx, int posy);
-	void draw(HDC* hdc);
+	Tile(int posx, int posy, wchar_t letter);
+	void draw(HDC hdc);
 };
 
