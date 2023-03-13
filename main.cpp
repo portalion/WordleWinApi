@@ -1,9 +1,8 @@
 #define NOMINMAX
-#include <windows.h>
+#include "App.h"
 
-int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previnstance, WCHAR* cmdline, int show_command)
+int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previnstance, PWSTR cmdline, int nCmdShow)
 {
-
-
-	return 0;
+	App app(instance);
+	return app.run(nCmdShow);
 }
