@@ -71,9 +71,6 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
 	case WM_CLOSE:
 		DestroyWindow(handle);
 		return 0;
-	case WM_DESTROY:
-		PostQuitMessage(EXIT_SUCCESS);
-		return 0;
     case WM_NCHITTEST: {
         LRESULT hit = DefWindowProc(hwnd, message, wparam, lparam);
         if (hit == HTCLIENT) hit = HTCAPTION;

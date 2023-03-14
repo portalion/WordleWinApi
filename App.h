@@ -1,6 +1,7 @@
 #pragma once
 #include "KeyboardWindow.h"
 #include "PuzzleWindow.h"
+#include <stack>
 
 class App
 {
@@ -10,6 +11,7 @@ private:
 
 	KeyboardWindow mainWindow;
 	std::vector<PuzzleWindow*> popupWindows;
+	std::stack<PuzzleWindow*> toDelete;
 
 	App(HINSTANCE instance);
 	void displayWindows(int show_command);
@@ -20,5 +22,6 @@ public:
 
 	static App* getInstance(HINSTANCE hinstance = nullptr);
 	static void releaseInstance(); //Call only in main
+	friend LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
 };
 

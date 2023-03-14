@@ -7,30 +7,25 @@ void App::displayWindows(int showCommand)
 {
 	ShowWindow(mainWindow.getHandle(), showCommand);
 	for(auto window : popupWindows)
-		ShowWindow(window->getHandle(), showCommand);
+		ShowWindow(window->getHandle(), SW_SHOWNA);
 }
 
 void App::ChangeDifficulty()
 {
-	for (auto window : popupWindows)delete window;
-	popupWindows.clear();
-	switch (Tile::difficulty)
+	for (auto window : popupWindows)
 	{
-	case Difficulty::EASY:
-		Tile::numberOfTries = 6;
-		popupWindows.push_back(new PuzzleWindow(m_instance, mainWindow.getHandle(), 0));
-		break;
-	case Difficulty::MEDIUM:
-		Tile::numberOfTries = 8;
-		for(int i = 0; i < 2; i++)
-			popupWindows.push_back(new PuzzleWindow(m_instance, mainWindow.getHandle(), i));
-		break;
-	case Difficulty::HARD:
-		Tile::numberOfTries = 10;
-		for (int i = 0; i < 4; i++)
-			popupWindows.push_back(new PuzzleWindow(m_instance, mainWindow.getHandle(), i));
-		break;
+		DestroyWindow(window->getHandle());
+		toDelete.push(window);
 	}
+	popupWindows.clear();
+
+	Tile::numberOfTries = Tile::difficulty == Difficulty::EASY ? 6 : 6 + static_cast<int>(Tile::difficulty);
+	for (int i = 0; i < static_cast<int>(Tile::difficulty); i++)
+		popupWindows.push_back(new PuzzleWindow(m_instance, mainWindow.getHandle(), i));
+
+	displayWindows(SW_SHOWNA);
+	for(auto window : popupWindows)
+		UpdateWindow(window->getHandle());
 }
 
 App::App(HINSTANCE instance)
@@ -48,7 +43,7 @@ App::App(HINSTANCE instance)
 
 	ChangeDifficulty();
 }
-
+#include <iostream>
 int App::run(int showCommand)
 {
 	displayWindows(showCommand);
@@ -60,6 +55,14 @@ int App::run(int showCommand)
 			return EXIT_FAILURE;
 		TranslateMessage(&msg);
 		DispatchMessageW(&msg);
+
+		while (!toDelete.empty())
+		{
+			delete toDelete.top();
+			toDelete.pop();
+		}
+		if (toDelete.empty())
+			std::cout << "a";
 	}
 
 	std::ofstream ofs("Wordle.ini");

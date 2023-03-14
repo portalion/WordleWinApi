@@ -1,4 +1,5 @@
 #include "KeyboardWindow.h"
+#include "App.h"
 
 const std::wstring KeyboardWindow::KeyboardLayout = L"QWERTYUIOPASDFGHJKLZXCVBNM";
 
@@ -77,12 +78,15 @@ LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARA
         {
         case ID_DIFFICULTY_EASY:
             Tile::difficulty = Difficulty::EASY;
+            App::getInstance()->ChangeDifficulty();
             break;
         case ID_DIFFICULTY_MEDIUM:
             Tile::difficulty = Difficulty::MEDIUM;
+            App::getInstance()->ChangeDifficulty();
             break;
         case ID_DIFFICULTY_HARD:
             Tile::difficulty = Difficulty::HARD;
+            App::getInstance()->ChangeDifficulty();
             break;
         }
     }
