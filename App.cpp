@@ -1,6 +1,8 @@
 #include "App.h"
 #include <fstream>
 
+App* App::instance = nullptr;
+
 void App::displayWindows(int showCommand)
 {
 	ShowWindow(mainWindow.getHandle(), showCommand);
@@ -8,7 +10,7 @@ void App::displayWindows(int showCommand)
 		ShowWindow(window->getHandle(), showCommand);
 }
 
-void App::setPopups()
+void App::ChangeDifficulty()
 {
 	for (auto window : popupWindows)delete window;
 	popupWindows.clear();
@@ -44,7 +46,7 @@ App::App(HINSTANCE instance)
 
 	Tile::difficulty = static_cast<Difficulty>(diffFromFile);
 
-	setPopups();
+	ChangeDifficulty();
 }
 
 int App::run(int showCommand)
@@ -66,4 +68,18 @@ int App::run(int showCommand)
 	ofs << "Difficulty=" << static_cast<int>(Tile::difficulty) << '\n';
 
 	return EXIT_SUCCESS;
+}
+
+App* App::getInstance(HINSTANCE hinstance)
+{
+	if (instance != nullptr) return instance;
+	
+	instance = new App(hinstance);
+	return instance;
+}
+
+void App::releaseInstance()
+{
+	delete instance;
+	instance = nullptr;
 }

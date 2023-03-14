@@ -5,17 +5,20 @@
 class App
 {
 private:
+	static App* instance;
 	HINSTANCE m_instance;
 
 	KeyboardWindow mainWindow;
 	std::vector<PuzzleWindow*> popupWindows;
 
+	App(HINSTANCE instance);
 	void displayWindows(int show_command);
-	void setPopups();
+	void ChangeDifficulty();
 
 public:
-	App(HINSTANCE instance);
 	int run(int showCommand);
 
+	static App* getInstance(HINSTANCE hinstance = nullptr);
+	static void releaseInstance(); //Call only in main
 };
 

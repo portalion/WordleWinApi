@@ -69,6 +69,25 @@ LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARA
 	case WM_DESTROY:
 		PostQuitMessage(EXIT_SUCCESS);
 		return 0;
+    case WM_COMMAND:
+    {
+        int wmId = LOWORD(wparam);
+
+        switch (wmId)
+        {
+        case ID_DIFFICULTY_EASY:
+            Tile::difficulty = Difficulty::EASY;
+            break;
+        case ID_DIFFICULTY_MEDIUM:
+            Tile::difficulty = Difficulty::MEDIUM;
+            break;
+        case ID_DIFFICULTY_HARD:
+            Tile::difficulty = Difficulty::HARD;
+            break;
+        }
+    }
+        
+        break;
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
