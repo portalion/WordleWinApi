@@ -34,19 +34,26 @@ void App::restartGame()
 {
 	Tile::currentLetter = 0;
 	Tile::currentRow = 0;
+
+	for (auto window : popupWindows)
+	{
+		auto item = dictionary.begin();
+		std::advance(item, rand() % dictionary.size());
+		window->word = item->first;
+		SetWindowText(window->handle, window->word.c_str());
+	}
 }
 
 void App::updateAfterKeyInput(wchar_t pressed)
 {
-	if (Tile::currentLetter > 4 || Tile::currentRow >= Tile::numberOfTries)return;
+	if (Tile::currentLetter >= Tile::wordSize || Tile::currentRow >= Tile::numberOfTries)return;
 
 	for (auto window : popupWindows)
-	{
-		window->tiles[Tile::currentLetter][Tile::currentRow].setLetter(pressed);
-		InvalidateRect(window->handle, nullptr, TRUE);
-	}
+		window->updateOnKeyPressed(pressed);
+	
 	InvalidateRect(mainWindow.handle, nullptr, FALSE);
 	Tile::currentLetter++;
+	typed += pressed;
 }
 
 void App::updateBackspace()
@@ -58,13 +65,19 @@ void App::updateBackspace()
 		InvalidateRect(window->handle, nullptr, FALSE);
 	}
 	Tile::currentLetter--;
+	typed = typed.substr(0, typed.size() - 1);
 }
 
 void App::updateEnter()
 {
-	if (Tile::currentLetter < 5 || Tile::currentRow >= Tile::numberOfTries)return;
+	if (Tile::currentLetter < Tile::wordSize || Tile::currentRow >= Tile::numberOfTries)return;
+
+	for (auto window : popupWindows)
+		window->updateOnEnter(dictionary.find(typed) != dictionary.end());
+
 	Tile::currentLetter = 0;
-	Tile::currentRow++;
+	Tile::currentRow += (dictionary.find(typed) != dictionary.end());
+	typed = L"";
 }
 
 App::App(HINSTANCE instance)
@@ -85,9 +98,10 @@ App::App(HINSTANCE instance)
 	{
 		std::string tmp;
 		dict >> tmp;
-		dictionary[tmp] = true;
+		std::transform(tmp.begin(), tmp.end(), tmp.begin(), toupper);
+		dictionary[std::wstring(tmp.begin(), tmp.end())] = true;
 	}
-	
+	auto it = dictionary.begin();
 
 	ChangeDifficulty();
 }

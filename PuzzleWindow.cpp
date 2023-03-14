@@ -1,4 +1,6 @@
 #include "PuzzleWindow.h"
+#include "App.h"
+
 
 PuzzleWindow::PuzzleWindow(HINSTANCE instance, HWND parent, int id)
     : tiles{Tile::wordSize}, id{id}
@@ -45,6 +47,43 @@ PuzzleWindow::PuzzleWindow(HINSTANCE instance, HWND parent, int id)
                 2 * Tile::margin + j * (Tile::size + Tile::margin), ' '));
 }
 
+void PuzzleWindow::updateOnEnter(bool good)
+{
+    if (!inGame)return;
+
+    if (!good)
+    {
+        for (int i = 0; i < Tile::wordSize; i++)
+            tiles[i][Tile::currentRow].setLetter(' ');
+        InvalidateRect(handle, nullptr, FALSE);
+        return;
+    }
+
+    bool won = true;
+
+    for (int i = 0; i < Tile::wordSize; i++)
+    {
+        wchar_t letter = tiles[i][Tile::currentRow].getLetter();
+
+        if (word[i] != letter) won = false;
+
+        if (word[i] == letter)tiles[i][Tile::currentRow].setColor(Color::Good);
+        else if (word.find(letter) != std::string::npos)tiles[i][Tile::currentRow].setColor(Color::Misplaced);
+        else tiles[i][Tile::currentRow].setColor(Color::Bad);
+    }
+
+    inGame = !won;
+
+    InvalidateRect(handle, nullptr, TRUE);
+}
+
+void PuzzleWindow::updateOnKeyPressed(wchar_t pressed)
+{
+    if (!inGame)return;
+    tiles[Tile::currentLetter][Tile::currentRow].setLetter(pressed);
+    InvalidateRect(handle, nullptr, TRUE);
+}
+
 bool PuzzleWindow::registerClass(HINSTANCE instance)
 {
     WNDCLASSEX wc{};
@@ -71,7 +110,7 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
 	case WM_CLOSE:
 		DestroyWindow(handle);
 		return 0;
-    case WM_NCHITTEST: {
+    case WM_NCHITTEST: { //https://stackoverflow.com/questions/7773771/how-do-i-implement-dragging-a-window-using-its-client-area
         LRESULT hit = DefWindowProc(hwnd, message, wparam, lparam);
         if (hit == HTCLIENT) hit = HTCAPTION;
         return hit;

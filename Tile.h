@@ -42,6 +42,7 @@ public:
 	//static const COLORREF fontColor;
 
 	inline void setLetter(wchar_t letter) { this->letter[0] = letter; }
+	inline wchar_t getLetter() { return letter[0]; }
 
 	void setColor(Color c);
 	Tile(int posx, int posy, wchar_t letter);

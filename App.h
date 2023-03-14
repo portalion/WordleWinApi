@@ -3,12 +3,14 @@
 #include "PuzzleWindow.h"
 #include <stack>
 #include <map>
+#include <random>
 
 class App
 {
 private:
 	static App* instance;
 	HINSTANCE m_instance;
+	std::wstring typed = L"";
 
 	KeyboardWindow mainWindow;
 	std::vector<PuzzleWindow*> popupWindows;
@@ -27,7 +29,7 @@ private:
 public:
 	int run(int showCommand);
 
-	std::map<std::string, bool> dictionary;
+	std::map<std::wstring, bool> dictionary;
 
 	static App* getInstance(HINSTANCE hinstance = nullptr);
 	static void releaseInstance(); //Call only in main
