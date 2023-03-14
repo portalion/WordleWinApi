@@ -90,6 +90,25 @@ LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARA
             break;
         }
     }
+    break;
+    case WM_KEYDOWN:
+    {
+        if (wparam == VK_BACK)
+        {
+            App::getInstance()->updateBackspace();
+            break;
+        }
+        if (wparam == VK_RETURN)
+        {
+            App::getInstance()->updateEnter();
+            break;
+        }
+
+        wchar_t pressed = wparam;
+        if (!isalpha(pressed))
+            break;
+        App::getInstance()->updateAfterKeyInput(pressed);
+    }
         
         break;
     case WM_PAINT:

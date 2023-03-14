@@ -2,6 +2,7 @@
 #include "KeyboardWindow.h"
 #include "PuzzleWindow.h"
 #include <stack>
+#include <map>
 
 class App
 {
@@ -17,8 +18,16 @@ private:
 	void displayWindows(int show_command);
 	void ChangeDifficulty();
 
+	void restartGame();
+
+	void updateAfterKeyInput(wchar_t pressed);
+	void updateBackspace();
+	void updateEnter();
+
 public:
 	int run(int showCommand);
+
+	std::map<std::string, bool> dictionary;
 
 	static App* getInstance(HINSTANCE hinstance = nullptr);
 	static void releaseInstance(); //Call only in main

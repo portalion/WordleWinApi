@@ -3,6 +3,8 @@
 #include "Tile.h"
 #include <vector>
 
+class App;
+
 class KeyboardWindow : public Window<KeyboardWindow>
 {
 private:
@@ -14,5 +16,7 @@ private:
 public:
 	KeyboardWindow(HINSTANCE instance);
 	LRESULT windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
+	friend App;
 };
 

@@ -2,14 +2,14 @@
 
 int Tile::numberOfTries = 6;
 Difficulty Tile::difficulty = Difficulty::EASY;
+int Tile::currentLetter = 0;
+int Tile::currentRow = 0;
 
 Tile::Tile(int posx, int posy, wchar_t letter) :
-	pos{ .left = posx, .top = posy, .right = posx + size, .bottom = posy + size}, 
-	actual{Color::None}
+	pos{ .left = posx, .top = posy, .right = posx + size, .bottom = posy + size}
 {
 	this->letter[0] = letter;
-	borderColor = actual == Color::None ? stateToColor(Color::Bad) : stateToColor(actual);
-	backgroundColor = stateToColor(actual);
+	setColor(Color::None);
 }
 
 void Tile::draw(HDC hdc)
@@ -25,6 +25,8 @@ void Tile::draw(HDC hdc)
 	hOldBrush = SelectObject(hdc, hBrush);
 
 	RoundRect(hdc, pos.left, pos.top, pos.right, pos.bottom, elipseSize, elipseSize);
+
+	SetBkMode(hdc, TRANSPARENT);
 	DrawText(hdc, letter, 1, &pos, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
 	SelectObject(hdc, hOldPen);
@@ -47,4 +49,11 @@ COLORREF stateToColor(Color color)
 		case Color::Good:
 			return RGB(121, 184, 81);
 	}
+}
+
+void Tile::setColor(Color c)
+{
+	actual = c;
+	borderColor = actual == Color::None ? stateToColor(Color::Bad) : stateToColor(actual);
+	backgroundColor = stateToColor(actual);
 }

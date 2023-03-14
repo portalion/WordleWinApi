@@ -23,9 +23,48 @@ void App::ChangeDifficulty()
 	for (int i = 0; i < static_cast<int>(Tile::difficulty); i++)
 		popupWindows.push_back(new PuzzleWindow(m_instance, mainWindow.getHandle(), i));
 
+	restartGame();
+
 	displayWindows(SW_SHOWNA);
 	for(auto window : popupWindows)
 		UpdateWindow(window->getHandle());
+}
+
+void App::restartGame()
+{
+	Tile::currentLetter = 0;
+	Tile::currentRow = 0;
+}
+
+void App::updateAfterKeyInput(wchar_t pressed)
+{
+	if (Tile::currentLetter > 4 || Tile::currentRow >= Tile::numberOfTries)return;
+
+	for (auto window : popupWindows)
+	{
+		window->tiles[Tile::currentLetter][Tile::currentRow].setLetter(pressed);
+		InvalidateRect(window->handle, nullptr, TRUE);
+	}
+	InvalidateRect(mainWindow.handle, nullptr, FALSE);
+	Tile::currentLetter++;
+}
+
+void App::updateBackspace()
+{
+	if (Tile::currentLetter <= 0)return;
+	for (auto window : popupWindows)
+	{
+		window->tiles[Tile::currentLetter - 1][Tile::currentRow].setLetter(' ');
+		InvalidateRect(window->handle, nullptr, FALSE);
+	}
+	Tile::currentLetter--;
+}
+
+void App::updateEnter()
+{
+	if (Tile::currentLetter < 5 || Tile::currentRow >= Tile::numberOfTries)return;
+	Tile::currentLetter = 0;
+	Tile::currentRow++;
 }
 
 App::App(HINSTANCE instance)
@@ -41,9 +80,18 @@ App::App(HINSTANCE instance)
 
 	Tile::difficulty = static_cast<Difficulty>(diffFromFile);
 
+	std::ifstream dict("Wordle.txt");
+	while (!dict.eof())
+	{
+		std::string tmp;
+		dict >> tmp;
+		dictionary[tmp] = true;
+	}
+	
+
 	ChangeDifficulty();
 }
-#include <iostream>
+
 int App::run(int showCommand)
 {
 	displayWindows(showCommand);
@@ -61,8 +109,6 @@ int App::run(int showCommand)
 			delete toDelete.top();
 			toDelete.pop();
 		}
-		if (toDelete.empty())
-			std::cout << "a";
 	}
 
 	std::ofstream ofs("Wordle.ini");

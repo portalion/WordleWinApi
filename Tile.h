@@ -36,8 +36,14 @@ public:
 	static const int wordSize = 5;
 	static int numberOfTries;
 	static Difficulty difficulty;
+
+	static int currentRow;
+	static int currentLetter;
 	//static const COLORREF fontColor;
 
+	inline void setLetter(wchar_t letter) { this->letter[0] = letter; }
+
+	void setColor(Color c);
 	Tile(int posx, int posy, wchar_t letter);
 	void draw(HDC hdc);
 };
