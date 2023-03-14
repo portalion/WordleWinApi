@@ -8,10 +8,10 @@ private:
 	HINSTANCE m_instance;
 
 	KeyboardWindow mainWindow;
-	PuzzleWindow popupWindow1;
+	std::vector<PuzzleWindow*> popupWindows;
 
-	Difficulty difficulty;
 	void displayWindows(int show_command);
+	void setPopups();
 
 public:
 	App(HINSTANCE instance);

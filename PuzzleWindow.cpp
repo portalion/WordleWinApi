@@ -1,7 +1,7 @@
 #include "PuzzleWindow.h"
 
-PuzzleWindow::PuzzleWindow(HINSTANCE instance, HWND parent, Difficulty& amount)
-    : amount{amount}, tiles{Tile::wordSize}
+PuzzleWindow::PuzzleWindow(HINSTANCE instance, HWND parent, int id)
+    : tiles{Tile::wordSize}, id{id}
 {
     registerClass(instance);
 
@@ -10,11 +10,27 @@ PuzzleWindow::PuzzleWindow(HINSTANCE instance, HWND parent, Difficulty& amount)
 
 
     AdjustWindowRectEx(&size, WS_OVERLAPPED | WS_CAPTION, false, 0);
-    const POINT position =
+    POINT position =
     {
-        .x = (GetSystemMetrics(SM_CXSCREEN) - size.right) / 2,
-        .y = (GetSystemMetrics(SM_CYSCREEN) - size.bottom) / 2
+        .x = GetSystemMetrics(SM_CXSCREEN) / 2,
+        .y = GetSystemMetrics(SM_CYSCREEN) / 2
     };
+
+    if (Tile::difficulty != Difficulty::EASY)
+    {
+        position.x /= 2;
+        position.x *= 2 * (id % 2) + 1;
+    }
+    if (Tile::difficulty == Difficulty::HARD)
+    {
+        position.y /= 2;
+        position.y *= id >= 2 ? 3 : 1;
+    }
+
+    position.x -= size.right / 2;
+    position.y -= size.bottom / 2;
+    
+
     handle = CreateWindowEx(0, nameOfClass.c_str(), L"WORDLE - PUZZLE",
         WS_OVERLAPPED | WS_CAPTION,
         position.x, position.y, size.right - size.left, size.bottom - size.top,

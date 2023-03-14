@@ -35,6 +35,7 @@ public:
 	static const int margin = 6;
 	static const int wordSize = 5;
 	static int numberOfTries;
+	static Difficulty difficulty;
 	//static const COLORREF fontColor;
 
 	Tile(int posx, int posy, wchar_t letter);
