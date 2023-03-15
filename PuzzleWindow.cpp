@@ -61,6 +61,20 @@ void PuzzleWindow::updateOnEnter(bool good)
 
     time = 0;
     SetTimer(handle, id, 10, nullptr);
+
+    if (inAnimation)
+    {
+        for (int i = 0; i < Tile::wordSize; i++)
+        {
+            wchar_t letter = tiles[i][animatedRow].getLetter();
+            if (word[i] == letter)tiles[i][animatedRow].setColor(Color::Good);
+            else if (word.find(letter) != std::string::npos)
+                tiles[i][animatedRow].setColor(Color::Misplaced);
+            else tiles[i][animatedRow].setColor(Color::Bad);
+        }
+        animatedRow++;
+    }
+
     inAnimation = true;
     updateInGame();
 }
@@ -120,16 +134,17 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
         {
             KillTimer(handle, id);
             inAnimation = false;
+            animatedRow++;
         }
         else
         {
             int animationIndex = time / Tile::AnimationTime;
-            wchar_t letter = tiles[animationIndex][Tile::currentRow - 1].getLetter();
+            wchar_t letter = tiles[animationIndex][animatedRow].getLetter();
 
-            if (word[animationIndex] == letter)tiles[animationIndex][Tile::currentRow - 1].setColor(Color::Good);
+            if (word[animationIndex] == letter)tiles[animationIndex][animatedRow].setColor(Color::Good);
             else if (word.find(letter) != std::string::npos)
-                tiles[animationIndex][Tile::currentRow - 1].setColor(Color::Misplaced);
-            else tiles[animationIndex][Tile::currentRow - 1].setColor(Color::Bad);
+                tiles[animationIndex][animatedRow].setColor(Color::Misplaced);
+            else tiles[animationIndex][animatedRow].setColor(Color::Bad);
         }
 
         InvalidateRect(handle, nullptr, TRUE);
@@ -146,7 +161,7 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
 
         for (int i = 0; i < tiles.size(); i++)
             for(int j = 0; j < tiles[i].size(); j++)
-                tiles[i][j].draw(hdc, j == Tile::currentRow - 1 ? 
+                tiles[i][j].draw(hdc, j == animatedRow ?
                     (i == (time / Tile::AnimationTime) ? time - Tile::AnimationTime * i : 0) : 0);
 
         if ((!inGame && !inAnimation) || Tile::currentRow == Tile::numberOfTries)

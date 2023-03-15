@@ -88,7 +88,15 @@ void App::updateEnter()
 			{
 				int index = KeyboardWindow::KeyboardLayout.find(
 					popupWindows[wnd]->tiles[i][Tile::currentRow].getLetter());
-				Color c = popupWindows[wnd]->tiles[i][Tile::currentRow].getColor();
+				wchar_t letter = popupWindows[wnd]->tiles[i][Tile::currentRow].getLetter();
+
+				Color c = Color::None;
+
+				if (popupWindows[wnd]->word[i] == letter)c = Color::Good;
+				else if (popupWindows[wnd]->word.find(letter) != std::string::npos)
+					c = Color::Misplaced;
+				else c = Color::Bad;
+				
 
 				if (index == std::string::npos)
 				{

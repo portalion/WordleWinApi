@@ -17,6 +17,7 @@ private:
 	std::wstring word;
 	bool inGame = true;
 	bool inAnimation = false;
+	int animatedRow = 0;
 	bool registerClass(HINSTANCE instance);
 	void updateOnKeyPressed(wchar_t typed);
 	void updateOnEnter(bool good);
