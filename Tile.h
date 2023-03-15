@@ -37,7 +37,7 @@ public:
 	static const int maxNumberOfWindows = 4;
 	static int numberOfTries;
 	static Difficulty difficulty;
-	static const int AnimationTime = 500;
+	static const int AnimationTime = 100;
 
 	static int currentRow;
 	static int currentLetter;
