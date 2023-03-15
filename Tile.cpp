@@ -48,7 +48,11 @@ void Tile::drawKeyboard(HDC hdc, Color colors[])
 	bool empty = true;
 	for (int i = 0; i < rectangles; i++)
 		if (colors[i] != Color::None)empty = false;
-	if (empty) return draw(hdc);
+	if (empty)
+	{
+		setColor(Color::None);
+		return draw(hdc);
+	}
 
 	HGDIOBJ hPen = nullptr;
 	HGDIOBJ hOldPen = nullptr;
