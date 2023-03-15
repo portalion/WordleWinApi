@@ -37,6 +37,7 @@ public:
 	static const int maxNumberOfWindows = 4;
 	static int numberOfTries;
 	static Difficulty difficulty;
+	static const int AnimationTime = 50;
 
 	static int currentRow;
 	static int currentLetter;
@@ -48,7 +49,7 @@ public:
 
 	void setColor(Color c);
 	Tile(int posx, int posy, wchar_t letter);
-	void draw(HDC hdc);
+	void draw(HDC hdc, int time = 0);
 	void drawKeyboard(HDC hdc, Color colors[]);
 };
 

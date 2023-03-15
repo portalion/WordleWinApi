@@ -15,6 +15,7 @@ private:
 	bool registerClass(HINSTANCE instance);
 	std::vector<Tile> tiles;
 	std::vector<Color*> colors;
+
 public:
 	KeyboardWindow(HINSTANCE instance);
 	LRESULT windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;

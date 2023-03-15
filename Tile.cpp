@@ -1,4 +1,5 @@
 #include "Tile.h"
+#include "PuzzleWindow.h"
 
 int Tile::numberOfTries = 6;
 Difficulty Tile::difficulty = Difficulty::EASY;
@@ -12,7 +13,7 @@ Tile::Tile(int posx, int posy, wchar_t letter) :
 	setColor(Color::None);
 }
 
-void Tile::draw(HDC hdc)
+void Tile::draw(HDC hdc, int time)
 {
 	HGDIOBJ hPen = nullptr;
 	HGDIOBJ hOldPen = nullptr;
@@ -24,7 +25,9 @@ void Tile::draw(HDC hdc)
 	hOldPen = SelectObject(hdc, hPen);
 	hOldBrush = SelectObject(hdc, hBrush);
 
-	RoundRect(hdc, pos.left, pos.top, pos.right, pos.bottom, elipseSize, elipseSize);
+	int animation = (pos.bottom - pos.top) / 2;
+	RoundRect(hdc, pos.left, pos.top + animation * time / (AnimationTime / 2), 
+		pos.right, pos.bottom - animation * time / (AnimationTime / 2), elipseSize, elipseSize);
 
 	SetBkMode(hdc, TRANSPARENT);
 	DrawText(hdc, letter, 1, &pos, DT_CENTER | DT_VCENTER | DT_SINGLELINE);

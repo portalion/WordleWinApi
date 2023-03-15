@@ -59,22 +59,10 @@ void PuzzleWindow::updateOnEnter(bool good)
         return;
     }
 
-    bool won = true;
-
-    for (int i = 0; i < Tile::wordSize; i++)
-    {
-        wchar_t letter = tiles[i][Tile::currentRow].getLetter();
-
-        if (word[i] != letter) won = false;
-
-        if (word[i] == letter)tiles[i][Tile::currentRow].setColor(Color::Good);
-        else if (word.find(letter) != std::string::npos)tiles[i][Tile::currentRow].setColor(Color::Misplaced);
-        else tiles[i][Tile::currentRow].setColor(Color::Bad);
-    }
-
-    inGame = !won;
-
-    InvalidateRect(handle, nullptr, TRUE);
+    time = 0;
+    SetTimer(handle, id, 10, nullptr);
+    inAnimation = true;
+    updateInGame();
 }
 
 void PuzzleWindow::updateOnKeyPressed(wchar_t pressed)
@@ -82,6 +70,15 @@ void PuzzleWindow::updateOnKeyPressed(wchar_t pressed)
     if (!inGame)return;
     tiles[Tile::currentLetter][Tile::currentRow].setLetter(pressed);
     InvalidateRect(handle, nullptr, TRUE);
+}
+
+void PuzzleWindow::updateInGame()
+{
+    bool won = true;
+    for (int i = 0; i < Tile::wordSize; i++)
+        if (word[i] != tiles[i][Tile::currentRow].getLetter()) won = false;
+
+    inGame = !won;
 }
 
 bool PuzzleWindow::registerClass(HINSTANCE instance)
@@ -115,17 +112,44 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
         if (hit == HTCLIENT) hit = HTCAPTION;
         return hit;
     }
+    case WM_TIMER:
+    {
+        time += 10;
+
+        if (time >= Tile::AnimationTime * Tile::wordSize)
+        {
+            KillTimer(handle, id);
+            inAnimation = false;
+        }
+        else
+        {
+            int animationIndex = time / Tile::AnimationTime;
+            wchar_t letter = tiles[animationIndex][Tile::currentRow - 1].getLetter();
+
+            if (word[animationIndex] == letter)tiles[animationIndex][Tile::currentRow - 1].setColor(Color::Good);
+            else if (word.find(letter) != std::string::npos)
+                tiles[animationIndex][Tile::currentRow - 1].setColor(Color::Misplaced);
+            else tiles[animationIndex][Tile::currentRow - 1].setColor(Color::Bad);
+        }
+
+        InvalidateRect(handle, nullptr, TRUE);
+    }   
+        break;
+    case WM_DESTROY:
+        KillTimer(handle, id);
+        break;
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
         HDC hdc;
         hdc = BeginPaint(hwnd, &ps);
 
-        for (auto row : tiles)
-            for(auto tile : row)
-                tile.draw(hdc);
+        for (int i = 0; i < tiles.size(); i++)
+            for(int j = 0; j < tiles[i].size(); j++)
+                tiles[i][j].draw(hdc, j == Tile::currentRow - 1 ? 
+                    (i == (time / Tile::AnimationTime) ? time - Tile::AnimationTime * i : 0) : 0);
 
-        if (!inGame || Tile::currentRow == Tile::numberOfTries)
+        if ((!inGame && !inAnimation) || Tile::currentRow == Tile::numberOfTries)
         {
             HGDIOBJ hBrush = CreateSolidBrush(RGB(255 * inGame, 255 * !inGame, 0));
             HGDIOBJ hOldBrush = nullptr;
