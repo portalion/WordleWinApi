@@ -34,6 +34,7 @@ public:
 	static const int elipseSize = 6;
 	static const int margin = 6;
 	static const int wordSize = 5;
+	static const int maxNumberOfWindows = 4;
 	static int numberOfTries;
 	static Difficulty difficulty;
 
@@ -43,9 +44,11 @@ public:
 
 	inline void setLetter(wchar_t letter) { this->letter[0] = letter; }
 	inline wchar_t getLetter() { return letter[0]; }
+	inline Color getColor() { return actual; }
 
 	void setColor(Color c);
 	Tile(int posx, int posy, wchar_t letter);
 	void draw(HDC hdc);
+	void drawKeyboard(HDC hdc, Color colors[]);
 };
 

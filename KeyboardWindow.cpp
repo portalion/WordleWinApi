@@ -25,7 +25,7 @@ bool KeyboardWindow::registerClass(HINSTANCE instance)
 }
 
 KeyboardWindow::KeyboardWindow(HINSTANCE instance)
-    :Window{}
+    :Window{}, colors{KeyboardLayout.size()}
 {
     registerClass(instance);
 
@@ -58,6 +58,20 @@ KeyboardWindow::KeyboardWindow(HINSTANCE instance)
         tiles.push_back(Tile(2 * Tile::margin + (Tile::size + Tile::margin) / 2
             + (i - 18) * (Tile::margin + Tile::size),
             2 * (Tile::margin + Tile::size + Tile::margin), KeyboardLayout[i]));
+
+    for (int i = 0; i < colors.size(); i++)colors[i] = new Color[Tile::maxNumberOfWindows];
+
+    resetColors();
+}
+
+void KeyboardWindow::resetColors()
+{
+    for (auto color : colors)
+        for (int i = 0; i < Tile::maxNumberOfWindows; i++)
+            color[i] = Color::None;
+
+    for (auto tile : tiles)
+        tile.setColor(Color::None);
 }
 
 LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -68,6 +82,7 @@ LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARA
 		DestroyWindow(handle);
 		return 0;
 	case WM_DESTROY:
+        for (int i = 0; i < colors.size(); i++)delete[] colors[i];
 		PostQuitMessage(EXIT_SUCCESS);
 		return 0;
     case WM_COMMAND:
@@ -117,8 +132,8 @@ LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARA
         HDC hdc;
         hdc = BeginPaint(hwnd, &ps);
 
-        for (auto tile : tiles)
-            tile.draw(hdc);
+        for (int i = 0; i < tiles.size(); i++)
+            tiles[i].drawKeyboard(hdc, colors[i]);
 
         EndPaint(hwnd, &ps);
     }

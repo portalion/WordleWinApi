@@ -36,6 +36,52 @@ void Tile::draw(HDC hdc)
 	DeleteObject(hPen);
 }
 
+void Tile::drawKeyboard(HDC hdc, Color colors[])
+{
+	int rectangles = static_cast<int>(difficulty);
+	if (rectangles == 1)
+	{
+		setColor(colors[0]);
+		return draw(hdc);
+	}
+
+	bool empty = true;
+	for (int i = 0; i < rectangles; i++)
+		if (colors[i] != Color::None)empty = false;
+	if (empty) return draw(hdc);
+
+	HGDIOBJ hPen = nullptr;
+	HGDIOBJ hOldPen = nullptr;
+	HGDIOBJ hBrush = nullptr;
+	HGDIOBJ hOldBrush = nullptr;
+
+	int Xsize = pos.right - pos.left;
+	int Ysize = pos.bottom - pos.top;
+
+	for (int i = 0; i < rectangles; i++)
+	{
+		hPen = CreatePen(PS_SOLID, 1, stateToColor(colors[i]));
+		hBrush = CreateSolidBrush(stateToColor(colors[i]));
+		hOldPen = SelectObject(hdc, hPen);
+		hOldBrush = SelectObject(hdc, hBrush);
+
+		RoundRect(hdc, 
+			pos.left + (Xsize / 2) * (i % 2),
+			pos.top + (rectangles == 2 ? 0 : (Ysize / 2) * (i / 2)),
+			pos.right - (Xsize / 2) * ((i + 1) % 2),
+			pos.bottom - (rectangles == 2 ? 0 : (Ysize / 2) * ((3 - i) / 2)),
+			elipseSize, elipseSize);
+
+		SelectObject(hdc, hOldPen);
+		SelectObject(hdc, hOldBrush);
+
+		DeleteObject(hBrush);
+		DeleteObject(hPen);
+	}
+	SetBkMode(hdc, TRANSPARENT);
+	DrawText(hdc, letter, 1, &pos, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+}
+
 COLORREF stateToColor(Color color)
 {
 	switch (color)

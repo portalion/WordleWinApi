@@ -28,12 +28,15 @@ void App::ChangeDifficulty()
 	displayWindows(SW_SHOWNA);
 	for(auto window : popupWindows)
 		UpdateWindow(window->getHandle());
+	InvalidateRect(mainWindow.handle, nullptr, TRUE);
 }
 
 void App::restartGame()
 {
 	Tile::currentLetter = 0;
 	Tile::currentRow = 0;
+
+	mainWindow.resetColors();
 
 	for (auto window : popupWindows)
 	{
@@ -72,11 +75,36 @@ void App::updateEnter()
 {
 	if (Tile::currentLetter < Tile::wordSize || Tile::currentRow >= Tile::numberOfTries)return;
 
+	bool goodWord = dictionary.find(typed) != dictionary.end();
+
 	for (auto window : popupWindows)
-		window->updateOnEnter(dictionary.find(typed) != dictionary.end());
+		window->updateOnEnter(goodWord);
+
+	if (goodWord)
+	{
+		for (int wnd = 0; wnd < popupWindows.size(); wnd++)
+		{
+			for (int i = 0; i < Tile::wordSize; i++)
+			{
+				int index = KeyboardWindow::KeyboardLayout.find(
+					popupWindows[wnd]->tiles[i][Tile::currentRow].getLetter());
+				Color c = popupWindows[wnd]->tiles[i][Tile::currentRow].getColor();
+
+				if (index == std::string::npos)
+				{
+					index = KeyboardWindow::KeyboardLayout.find(typed[i]);
+					c = Color::Bad;
+				}
+
+				mainWindow.colors[index][wnd] =
+					mainWindow.colors[index][wnd] > c ? mainWindow.colors[index][wnd] : c;
+			}
+		}
+		InvalidateRect(mainWindow.handle, nullptr, TRUE);
+	}
 
 	Tile::currentLetter = 0;
-	Tile::currentRow += (dictionary.find(typed) != dictionary.end());
+	Tile::currentRow += goodWord;
 	typed = L"";
 }
 

@@ -125,6 +125,32 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
             for(auto tile : row)
                 tile.draw(hdc);
 
+        if (!inGame || Tile::currentRow == Tile::numberOfTries)
+        {
+            HGDIOBJ hBrush = CreateSolidBrush(RGB(255 * inGame, 255 * !inGame, 0));
+            HGDIOBJ hOldBrush = nullptr;
+            HGDIOBJ hPen = CreatePen(PS_SOLID, 0, RGB(255 * inGame, 255 * !inGame, 0));
+            HGDIOBJ hOldPen = nullptr;
+
+            hOldBrush = SelectObject(hdc, hBrush);
+            hOldPen = SelectObject(hdc, hPen);
+
+            RECT size;
+            GetClientRect(handle, &size);
+            Rectangle(hdc, size.left, size.top, size.right, size.bottom);
+            if (inGame)
+            {
+                SetTextColor(hdc, RGB(255, 255, 255));
+                DrawText(hdc, word.c_str(), 5, &size, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+            }
+            
+            SelectObject(hdc, hOldPen);
+            SelectObject(hdc, hOldBrush);
+
+            DeleteObject(hBrush);
+            DeleteObject(hPen);
+        }
+
         EndPaint(hwnd, &ps);
         return 0;
     }
