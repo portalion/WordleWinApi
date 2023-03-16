@@ -1,5 +1,6 @@
 #include "PuzzleWindow.h"
 #include "App.h"
+#include <wingdi.h>
 
 
 PuzzleWindow::PuzzleWindow(HINSTANCE instance, HWND parent, int id)
@@ -164,9 +165,11 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
         HDC Memhdc;
         HDC hdc;
         HBITMAP Membitmap;
+        HBITMAP AlphaBlendBitmap;
         hdc = BeginPaint(handle, &ps);
         Memhdc = CreateCompatibleDC(hdc);
         Membitmap = CreateCompatibleBitmap(hdc, win_width, win_height);
+        AlphaBlendBitmap = CreateCompatibleBitmap(hdc, win_width, win_height);
         SelectObject(Memhdc, Membitmap);
         //drawing code goes in here
 
@@ -176,6 +179,8 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
             for (int j = 0; j < tiles[i].size(); j++)
                 tiles[i][j].draw(Memhdc, j == animatedRow ?
                     (i == (time / Tile::AnimationTime) ? time - Tile::AnimationTime * i : 0) : 0);
+
+        BitBlt(hdc, 0, 0, win_width, win_height, Memhdc, 0, 0, SRCCOPY);
 
         if ((!inGame  || Tile::currentRow == Tile::numberOfTries) && !inAnimation)
         {
@@ -201,10 +206,19 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
 
             DeleteObject(hBrush);
             DeleteObject(hPen);
+
+            BLENDFUNCTION fun =
+            {
+                .BlendOp = AC_SRC_OVER,
+                .BlendFlags = 0,
+                .SourceConstantAlpha = 150,
+            };
+
+            AlphaBlend(hdc, 0, 0, win_width, win_height, Memhdc, 0, 0, win_width, win_height, fun);
         }
 
-        BitBlt(hdc, 0, 0, win_width, win_height, Memhdc, 0, 0, SRCCOPY);
         DeleteObject(Membitmap);
+        DeleteObject(AlphaBlendBitmap);
         DeleteDC(Memhdc);
         DeleteDC(hdc);
         EndPaint(handle, &ps);
