@@ -126,16 +126,31 @@ LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARA
     }
         
         break;
-    case WM_PAINT:
+    case WM_PAINT: //https://www.robertelder.ca/doublebuffering anti flickerking code
     {
+        RECT Client_Rect;
+        GetClientRect(handle, &Client_Rect);
+        int win_width = Client_Rect.right - Client_Rect.left;
+        int win_height = Client_Rect.bottom + Client_Rect.left;
         PAINTSTRUCT ps;
+        HDC Memhdc;
         HDC hdc;
-        hdc = BeginPaint(hwnd, &ps);
-
+        HBITMAP Membitmap;
+        hdc = BeginPaint(handle, &ps);
+        Memhdc = CreateCompatibleDC(hdc);
+        Membitmap = CreateCompatibleBitmap(hdc, win_width, win_height);
+        SelectObject(Memhdc, Membitmap);
+        //drawing code goes in here
+        Rectangle(Memhdc, -10, -10, win_width, win_height);
         for (int i = 0; i < tiles.size(); i++)
-            tiles[i].drawKeyboard(hdc, colors[i]);
+            tiles[i].drawKeyboard(Memhdc, colors[i]);
 
-        EndPaint(hwnd, &ps);
+        BitBlt(hdc, 0, 0, win_width, win_height, Memhdc, 0, 0, SRCCOPY);
+        DeleteObject(Membitmap);
+        DeleteDC(Memhdc);
+        DeleteDC(hdc);
+        EndPaint(handle, &ps);
+
     }
         return 0L;
 	}

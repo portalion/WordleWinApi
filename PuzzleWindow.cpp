@@ -83,7 +83,7 @@ void PuzzleWindow::updateOnKeyPressed(wchar_t pressed)
 {
     if (!inGame)return;
     tiles[Tile::currentLetter][Tile::currentRow].setLetter(pressed);
-    InvalidateRect(handle, nullptr, TRUE);
+    InvalidateRect(handle, nullptr, FALSE);
 }
 
 void PuzzleWindow::updateInGame()
@@ -147,7 +147,7 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
             else tiles[animationIndex][animatedRow].setColor(Color::Bad);
         }
 
-        InvalidateRect(handle, nullptr, TRUE);
+        InvalidateRect(handle, nullptr, FALSE);
     }   
         break;
     case WM_DESTROY:
@@ -155,42 +155,61 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
         break;
     case WM_PAINT:
     {
+
+        RECT Client_Rect;
+        GetClientRect(handle, &Client_Rect);
+        int win_width = Client_Rect.right - Client_Rect.left;
+        int win_height = Client_Rect.bottom + Client_Rect.left;
         PAINTSTRUCT ps;
+        HDC Memhdc;
         HDC hdc;
-        hdc = BeginPaint(hwnd, &ps);
+        HBITMAP Membitmap;
+        hdc = BeginPaint(handle, &ps);
+        Memhdc = CreateCompatibleDC(hdc);
+        Membitmap = CreateCompatibleBitmap(hdc, win_width, win_height);
+        SelectObject(Memhdc, Membitmap);
+        //drawing code goes in here
+
+        Rectangle(Memhdc, -10, -10, win_width + 10, win_height + 10);
 
         for (int i = 0; i < tiles.size(); i++)
-            for(int j = 0; j < tiles[i].size(); j++)
-                tiles[i][j].draw(hdc, j == animatedRow ?
+            for (int j = 0; j < tiles[i].size(); j++)
+                tiles[i][j].draw(Memhdc, j == animatedRow ?
                     (i == (time / Tile::AnimationTime) ? time - Tile::AnimationTime * i : 0) : 0);
 
-        if ((!inGame && !inAnimation) || Tile::currentRow == Tile::numberOfTries)
+        if ((!inGame  || Tile::currentRow == Tile::numberOfTries) && !inAnimation)
         {
             HGDIOBJ hBrush = CreateSolidBrush(RGB(255 * inGame, 255 * !inGame, 0));
             HGDIOBJ hOldBrush = nullptr;
             HGDIOBJ hPen = CreatePen(PS_SOLID, 0, RGB(255 * inGame, 255 * !inGame, 0));
             HGDIOBJ hOldPen = nullptr;
 
-            hOldBrush = SelectObject(hdc, hBrush);
-            hOldPen = SelectObject(hdc, hPen);
+            hOldBrush = SelectObject(Memhdc, hBrush);
+            hOldPen = SelectObject(Memhdc, hPen);
 
             RECT size;
             GetClientRect(handle, &size);
-            Rectangle(hdc, size.left, size.top, size.right, size.bottom);
+            Rectangle(Memhdc, size.left, size.top, size.right, size.bottom);
             if (inGame)
             {
-                SetTextColor(hdc, RGB(255, 255, 255));
-                DrawText(hdc, word.c_str(), 5, &size, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+                SetTextColor(Memhdc, RGB(255, 255, 255));
+                DrawText(Memhdc, word.c_str(), 5, &size, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
             }
-            
-            SelectObject(hdc, hOldPen);
-            SelectObject(hdc, hOldBrush);
+
+            SelectObject(Memhdc, hOldPen);
+            SelectObject(Memhdc, hOldBrush);
 
             DeleteObject(hBrush);
             DeleteObject(hPen);
         }
 
-        EndPaint(hwnd, &ps);
+        BitBlt(hdc, 0, 0, win_width, win_height, Memhdc, 0, 0, SRCCOPY);
+        DeleteObject(Membitmap);
+        DeleteDC(Memhdc);
+        DeleteDC(hdc);
+        EndPaint(handle, &ps);
+
+        
         return 0;
     }
     

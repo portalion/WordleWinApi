@@ -28,7 +28,7 @@ void App::ChangeDifficulty()
 	displayWindows(SW_SHOWNA);
 	for(auto window : popupWindows)
 		UpdateWindow(window->getHandle());
-	InvalidateRect(mainWindow.handle, nullptr, TRUE);
+	InvalidateRect(mainWindow.handle, nullptr, FALSE);
 }
 
 void App::restartGame()
@@ -108,7 +108,7 @@ void App::updateEnter()
 					mainWindow.colors[index][wnd] > c ? mainWindow.colors[index][wnd] : c;
 			}
 		}
-		InvalidateRect(mainWindow.handle, nullptr, TRUE);
+		InvalidateRect(mainWindow.handle, nullptr, FALSE);
 	}
 
 	Tile::currentLetter = 0;
