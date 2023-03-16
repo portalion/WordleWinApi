@@ -165,11 +165,9 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
         HDC Memhdc;
         HDC hdc;
         HBITMAP Membitmap;
-        HBITMAP AlphaBlendBitmap;
         hdc = BeginPaint(handle, &ps);
         Memhdc = CreateCompatibleDC(hdc);
         Membitmap = CreateCompatibleBitmap(hdc, win_width, win_height);
-        AlphaBlendBitmap = CreateCompatibleBitmap(hdc, win_width, win_height);
         SelectObject(Memhdc, Membitmap);
         //drawing code goes in here
 
@@ -218,7 +216,6 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
         }
 
         DeleteObject(Membitmap);
-        DeleteObject(AlphaBlendBitmap);
         DeleteDC(Memhdc);
         DeleteDC(hdc);
         EndPaint(handle, &ps);
