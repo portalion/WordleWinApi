@@ -94,14 +94,17 @@ LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARA
         case ID_DIFFICULTY_EASY:
             Tile::difficulty = Difficulty::EASY;
             App::getInstance()->ChangeDifficulty();
+            //CheckMenuItem(GetMenu(handle), ID_DIFFICULTY_EASY, MF_CHECKED);
             break;
         case ID_DIFFICULTY_MEDIUM:
             Tile::difficulty = Difficulty::MEDIUM;
             App::getInstance()->ChangeDifficulty();
+            //CheckMenuItem(GetMenu(handle), ID_DIFFICULTY_MEDIUM, MF_CHECKED);
             break;
         case ID_DIFFICULTY_HARD:
             Tile::difficulty = Difficulty::HARD;
             App::getInstance()->ChangeDifficulty();
+            //CheckMenuItem(GetMenu(handle), ID_DIFFICULTY_HARD, MF_CHECKED);
             break;
         }
     }

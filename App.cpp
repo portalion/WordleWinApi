@@ -29,6 +29,16 @@ void App::ChangeDifficulty()
 	for(auto window : popupWindows)
 		UpdateWindow(window->getHandle());
 	InvalidateRect(mainWindow.handle, nullptr, FALSE);
+
+	CheckMenuItem(GetMenu(mainWindow.handle), ID_DIFFICULTY_EASY, MF_UNCHECKED);
+	CheckMenuItem(GetMenu(mainWindow.handle), ID_DIFFICULTY_MEDIUM, MF_UNCHECKED);
+	CheckMenuItem(GetMenu(mainWindow.handle), ID_DIFFICULTY_HARD, MF_UNCHECKED);
+
+	UINT currentId = Tile::difficulty == Difficulty::EASY ? ID_DIFFICULTY_EASY : 
+					 Tile::difficulty == Difficulty::MEDIUM ? ID_DIFFICULTY_MEDIUM :
+																ID_DIFFICULTY_HARD;
+	CheckMenuItem(GetMenu(mainWindow.handle), currentId, MF_CHECKED);
+
 }
 
 void App::restartGame()
