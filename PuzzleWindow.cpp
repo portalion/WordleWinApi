@@ -195,8 +195,26 @@ LRESULT PuzzleWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM 
             Rectangle(Memhdc, size.left, size.top, size.right, size.bottom);
             if (inGame)
             {
-                SetTextColor(Memhdc, RGB(255, 255, 255));
+                HFONT font = CreateFont(
+                    -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 50),
+                    0,
+                    0,
+                    0,
+                    FW_BOLD,
+                    FALSE,
+                    FALSE,
+                    0,
+                    EASTEUROPE_CHARSET,
+                    OUT_DEFAULT_PRECIS,
+                    CLIP_DEFAULT_PRECIS,
+                    DEFAULT_QUALITY,
+                    DEFAULT_PITCH | FF_SWISS,
+                    L" Verdana ");
+                HFONT oldFont = static_cast<HFONT>(SelectObject(Memhdc, font));
                 DrawText(Memhdc, word.c_str(), 5, &size, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+                SelectObject(hdc, oldFont);
+
+                DeleteObject(font);
             }
 
             SelectObject(Memhdc, hOldPen);

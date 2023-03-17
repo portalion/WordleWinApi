@@ -119,7 +119,7 @@ LRESULT KeyboardWindow::windowProc(HWND hwnd, UINT message, WPARAM wparam, LPARA
             break;
         }
 
-        wchar_t pressed = wparam;
+        wchar_t pressed = static_cast<wchar_t>(wparam);
         if (!isalpha(pressed))
             break;
         App::getInstance()->updateAfterKeyInput(pressed);
