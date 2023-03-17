@@ -53,7 +53,7 @@ void App::restartGame()
 		auto item = dictionary.begin();
 		std::advance(item, rand() % dictionary.size());
 		window->word = item->first;
-		SetWindowText(window->handle, window->word.c_str());
+		//SetWindowText(window->handle, window->word.c_str());
 	}
 }
 
