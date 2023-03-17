@@ -129,15 +129,17 @@ void App::updateEnter()
 App::App(HINSTANCE instance)
 	: m_instance{instance}, mainWindow{instance}
 {
-	std::ifstream ifs("Wordle.ini");
-	int diffFromFile = 1;
-	std::string tmp;
-	ifs >> tmp >> tmp;
-	diffFromFile = tmp[tmp.size() - 1] - '0';
+	wchar_t diffFromFile[2];
+	GetPrivateProfileString(
+		L"WORDLE",
+		L"DIFFICULTY",
+		L"1",
+		diffFromFile,
+		2,
+		L".\\Wordle.ini"
+	);
 
-	if (diffFromFile != 1 && diffFromFile != 2 && diffFromFile != 4)diffFromFile = 1;
-
-	Tile::difficulty = static_cast<Difficulty>(diffFromFile);
+	Tile::difficulty = static_cast<Difficulty>(diffFromFile[0] - '0');
 
 	std::ifstream dict("Wordle.txt");
 	while (!dict.eof())
@@ -171,10 +173,7 @@ int App::run(int showCommand)
 		}
 	}
 
-	std::ofstream ofs("Wordle.ini");
-
-	ofs << "[WORDLE]\n";
-	ofs << "Difficulty=" << static_cast<int>(Tile::difficulty) << '\n';
+	WritePrivateProfileString(L"WORDLE", L"DIFFICULTY", std::to_wstring(static_cast<int>(Tile::difficulty)).c_str(), L".\\Wordle.ini");
 
 	return EXIT_SUCCESS;
 }
